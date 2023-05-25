@@ -14,7 +14,8 @@ if (window.ethereum) {
   window.web3 = new Web3(web3.currentProvider);
 } else {
   // Non-dapp browsers...
-  console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+  alert("메타마스크가 설치되어 있지 않습니다. 메타마스크를 설치해주세요.");
+  window.location.href = "https://metamask.io/";
 }
 
 export default web3;
