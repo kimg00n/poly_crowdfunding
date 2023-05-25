@@ -3,6 +3,11 @@
     <v-content>
       <v-container>
         <v-layout class="wrap justify-center">
+          <v-switch
+            label="Change Theme"
+            @change="toggleDarkTheme()"
+            style="position: absolute; left: 10px;"
+          ></v-switch>
           <v-flex class="text-center">
             <h1 class="display-2 font-weight-bold mb-3">
               Poly-Crowdfunding
@@ -16,7 +21,7 @@
         <v-layout class="wrap justify-center">
           <v-dialog v-model="startProjectDialog" width="auto">
             <template v-slot:activator="{props}">
-              <v-btn slot="activator" v-bind="props">Start a Project</v-btn>
+              <v-btn slot="activator" v-bind="props" class="btn btn-primary">Start a Project</v-btn>
             </template>
             <v-card width="600px">
               <v-card-title class="headline font-weight-bold mt-2 ml-4 text-center">
@@ -137,7 +142,7 @@
                     <br/><br/>
                     <small>Up Until: <b>{{ new Date(project.deadline * 1000) }}</b></small>
                     <br/><br/>
-                    <small>Goal of <b>{{ project.goalAmount / 10**18 }} MATIC ({{ currentPrice * (project.goalAmount / 10**18) }} USD)</b></small>
+                    <small>Goal of <b>{{ project.goalAmount / 10**18 }} MATIC ({{ currentPrice.toFixed(2) * (project.goalAmount / 10**18) }} USD)</b></small>
                     <small v-if="project.currentState == 1">wasn't achieved before deadline</small>
                     <small v-if="project.currentState == 2">has been achieved</small>
                   </div>
@@ -285,6 +290,9 @@ export default {
       }).then(() => {
         this.projectData[index].isLoading = false;
       });
+    },
+    toggleDarkTheme() {
+      this.$vuetify.theme.global.name = this.$vuetify.theme.global.name === 'light' ? 'dark' : 'light';
     },
   },
 };
