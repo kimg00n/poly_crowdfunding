@@ -1,55 +1,54 @@
 <template>
-  <v-app class="grey lighten-3">
+  <v-app>
     <v-content>
       <v-container>
-        <v-layout
-          text-xs-center
-          wrap
-        >
-          <v-flex mb-4>
+        <v-layout class="wrap justify-center">
+          <v-flex class="text-center">
             <h1 class="display-2 font-weight-bold mb-3">
-              Crowdfunding
+              Poly-Crowdfunding
             </h1>
             <p class="subheading font-weight-regular">
               Utilizing Ethereum for Decentralized Crowdfunding
             </p>
           </v-flex>
         </v-layout>
-
-        <v-layout row justify-center>
-          <v-dialog v-model="startProjectDialog" max-width="600px" persistent>
-            <v-btn slot="activator" color="primary" dark>Start a Project</v-btn>
-            <v-card>
-              <v-card-title>
-                <span class="headline font-weight-bold mt-2 ml-4">Bring your project to life</span>
+        
+        <v-layout class="wrap justify-center">
+          <v-dialog v-model="startProjectDialog" width="auto">
+            <template v-slot:activator="{props}">
+              <v-btn slot="activator" v-bind="props">Start a Project</v-btn>
+            </template>
+            <v-card width="600px">
+              <v-card-title class="headline font-weight-bold mt-2 ml-4 text-center">
+                <span>Bring your project to life</span>
               </v-card-title>
-              <v-card-text class="pt-0">
-                <v-container class="pt-0" grid-list-md>
-                  <v-layout wrap>
-                    <v-flex xs12>
+              <v-card-text>
+                <v-container>
+                  <v-layout class="d-flex flex-column">
+                    <v-flex>
                       <v-text-field
                         label="Title"
                         persistent-hint
                         v-model="newProject.title">
                       </v-text-field>
                     </v-flex>
-                    <v-flex xs12>
+                    <v-flex>
                       <v-textarea
                         label="Description"
                         persistent-hint
                         v-model="newProject.description">
                       </v-textarea>
                     </v-flex>
-                    <v-flex xs12 sm6>
+                    <v-flex>
                       <v-text-field
-                        label="Amount Needed (ETH)"
+                        label="Amount Needed (MATIC)"
                         type="number"
                         step="0.0001"
                         min="0"
                         v-model="newProject.amountGoal">
                       </v-text-field>
                     </v-flex>
-                    <v-flex xs12 sm6>
+                    <v-flex>
                       <v-text-field
                         label="Duration (in days)"
                         type="number"
@@ -61,18 +60,18 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
+                <v-btn color="blue darken-1"
+                  flat
+                  @click="startProject"
+                  :loading="newProject.isLoading">
+                  Save
+                </v-btn>
                 <v-btn
                   color="blue darken-1"
                   flat
-                  click="startProjectDialog = false;
+                  @click="startProjectDialog = false;
                   newProject.isLoading = false;">
                   Close
-                </v-btn>
-                <v-btn color="blue darken-1"
-                  flat
-                  click="startProject"
-                  :loading="newProject.isLoading">
-                  Save
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -80,20 +79,18 @@
         </v-layout>
       </v-container>
 
-      <v-container
-        grid-list-lg
-      >
+      <v-container>
         <h1 class="display-1 font-weight-bold mb-3">
           Projects
         </h1>
-        <v-layout row wrap>
-          <v-flex v-for="(project, index) in projectData" :key="index" xs12>
+        <v-layout class="d-flex flex-column">
+          <v-flex v-for="(project, index) in projectData" :key="index">
             <v-dialog
               v-model="project.dialog"
-              width="800"
+              width="800px"
             >
               <v-card>
-                <v-card-title class="headline font-weight-bold">
+                <v-card-title class="headline font-weight-bold text-center">
                   {{ project.projectTitle }}
                 </v-card-title>
                 <v-card-text>
@@ -111,10 +108,15 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-            <v-hover>
+            <v-hover
+            v-slot="{ isHovering, props }"
+            disabled
+            >
               <v-card
-                slot-scope="{ hover }"
-                :class="`elevation-${hover ? 10 : 2}`"
+                class=" elevation-12 mb-12 "
+                :elevation="isHovering ? 10 : 2"
+                v-bind="props"
+                width="auto"
               >
                 <v-card-title primary-title>
                   <div>
@@ -135,7 +137,7 @@
                     <br/><br/>
                     <small>Up Until: <b>{{ new Date(project.deadline * 1000) }}</b></small>
                     <br/><br/>
-                    <small>Goal of <b>{{ project.goalAmount / 10**18 }} ETH </b></small>
+                    <small>Goal of <b>{{ project.goalAmount / 10**18 }} MATIC ({{ currentPrice * (project.goalAmount / 10**18) }} USD)</b></small>
                     <small v-if="project.currentState == 1">wasn't achieved before deadline</small>
                     <small v-if="project.currentState == 2">has been achieved</small>
                   </div>
@@ -144,7 +146,7 @@
                   v-if="project.currentState == 0 && account != project.projectStarter"
                   class="d-flex ml-3" xs12 sm6 md3>
                   <v-text-field
-                    label="Amount (in ETH)"
+                    label="Amount (in MATIC)"
                     type="number"
                     step="0.0001"
                     min="0"
@@ -170,18 +172,15 @@
                     Get refund
                   </v-btn>
                 </v-flex>
-                <v-card-actions v-if="project.currentState == 0" class="text-xs-center">
-                  <span class="font-weight-bold" style="width: 200px;">
-                    {{ project.currentAmount / 10**18 }} ETH
+                <v-card-actions v-if="project.currentState == 0">
+                  <span class="font-weight-bold" style="white-space: nowrap; position: absolute; width: 100%; text-align: center;">
+                    {{ project.currentAmount / 10**18 }} MATIC / {{ project.goalAmount / 10**18 }} MATIC
                   </span>
                   <v-progress-linear
-                    height="10"
+                    height="20"
                     :color="stateMap[project.currentState].color"
                     :value="(project.currentAmount / project.goalAmount) * 100"
                   ></v-progress-linear>
-                  <span class="font-weight-bold" style="width: 200px;">
-                    {{ project.goalAmount / 10**18 }} ETH
-                  </span>
                 </v-card-actions>
               </v-card>
             </v-hover>
@@ -193,7 +192,6 @@
 </template>
 
 <script>
-// We import our the scripts for the smart contract instantiation, and web3
 import crowdfundInstance from '../contracts/crowdfundInstance';
 import crowdfundProject from '../contracts/crowdfundProjectInstance';
 import web3 from '../contracts/web3';
@@ -211,10 +209,10 @@ export default {
       ],
       projectData: [],
       newProject: { isLoading: false },
+      currentPrice: 0,
     };
   },
   mounted() {
-    // this code snippet takes the account (wallet) that is currently active
     web3.eth.getAccounts().then((accounts) => {
       [this.account] = accounts;
       this.getProjects();
@@ -232,6 +230,11 @@ export default {
             this.projectData.push(projectInfo);
           });
         });
+      });
+      fetch('https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd')
+          .then((res) => res.json())
+          .then((res) => {
+            this.currentPrice = res['matic-network'].usd;
       });
     },
     startProject() {
@@ -285,4 +288,5 @@ export default {
     },
   },
 };
+
 </script>

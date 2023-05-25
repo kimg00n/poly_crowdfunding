@@ -1,7 +1,7 @@
 /* eslint-disable */
 import web3 from './web3';
 
-const address = '0x5b85eab24F56903bece115fC217Fbb29A4c48b8B';
+const address = '0x283Fb005533A04635EC2C8bcc297C2A7CE5dfd11';
 const abi =     [
     {
         "constant": false,
