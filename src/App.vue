@@ -206,14 +206,14 @@
                     </v-btn>
                   </v-flex>
                   <v-card-actions v-if="project.currentState == 0">
-                    <span class="font-weight-bold" style="white-space: nowrap; position: absolute; width: 100%; text-align: center;">
-                      {{ project.currentAmount / 10**18 }} MATIC / {{ project.goalAmount / 10**18 }} MATIC
-                    </span>
                     <v-progress-linear
                       height="20"
                       :color="stateMap[project.currentState].color"
-                      :value="(project.currentAmount / project.goalAmount) * 100"
+                      :model-value="(project.currentAmount / project.goalAmount) * 100"
                     ></v-progress-linear>
+                    <span class="font-weight-bold" style="white-space: nowrap; position: absolute; width: 100%; text-align: center;">
+                      {{ project.currentAmount / 10**18 }} MATIC / {{ project.goalAmount / 10**18 }} MATIC
+                    </span>
                   </v-card-actions>
                 </v-card>
               </v-hover>
