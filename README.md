@@ -1,4 +1,4 @@
-# Poly-CrowdFunding Dapp
+# 크라우드펀딩을 통해 듣는 스토리 Dapp
 
 CrowdFunding Dapp in polygon testnet(Mumbai)
 
