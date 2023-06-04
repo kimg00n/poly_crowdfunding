@@ -19,8 +19,24 @@
             </h1>
             <p class="subheading font-weight-regular">
               {{ isLanguageToggled ? '번역해야함' : 'Utilizing Ethereum for Decentralized Crowdfunding' }}
-              
             </p>
+            <v-btn
+            v-if="!account"
+            class="btn btn-primary"
+            @click="connectWallet()"
+            style="position: absolute; right: 10px; top: 20px;"
+          >
+            Connect Wallet
+          </v-btn>
+          <v-btn
+            v-if="account"
+            class="btn btn-primary"
+            @click="disconnectWallet()"
+            style="position: absolute; right: 10px; top: 20px;"
+          >
+            {{ account.substring(0, 6) }}...{{ account.substring(account.length - 4) }}
+          </v-btn>
+          
           </v-flex>
         </v-layout>
         
@@ -362,7 +378,15 @@ export default {
         }
         // return currentState === 2 ? 'display:block' : 'display:none';
       }
-    }
+    },
+    connectWallet() {
+      window.ethereum.enable().then((accounts) => {
+        [this.account] = accounts;
+      });
+    },
+    disconnectWallet() {
+      this.account = null;
+    },
   }
 };
 </script>
