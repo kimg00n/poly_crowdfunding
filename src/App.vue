@@ -2,18 +2,24 @@
   <v-app>
     <v-content>
       <v-container>
-        <v-layout class="wrap justify-center">
+        <v-layout class="wrap justify-center" style="padding-top:inherit; padding-bottom: inherit;">
           <v-switch
             label="Change Theme"
             @change="toggleDarkTheme()"
             style="position: absolute; left: 10px;"
           ></v-switch>
+          <v-switch
+            label="Change Language"
+            @change="toggleLanguage()"
+            style="position: absolute; left: 10px; top: 60px;"
+          ></v-switch>
           <v-flex class="text-center">
             <h1 class="display-2 font-weight-bold mb-3">
-              Poly-Crowdfunding
+              {{ isLanguageToggled ? '폴리 크라우드펀딩' : 'Poly-Crowdfunding' }}
             </h1>
             <p class="subheading font-weight-regular">
-              Utilizing Ethereum for Decentralized Crowdfunding
+              {{ isLanguageToggled ? '번역해야함' : 'Utilizing Ethereum for Decentralized Crowdfunding' }}
+              
             </p>
           </v-flex>
         </v-layout>
@@ -21,18 +27,18 @@
         <v-layout class="wrap justify-center">
           <v-dialog v-model="startProjectDialog" width="auto">
             <template v-slot:activator="{props}">
-              <v-btn slot="activator" v-bind="props" class="btn btn-primary">Start a Project</v-btn>
+              <v-btn slot="activator" v-bind="props" class="btn btn-primary" >{{ isLanguageToggled ? '펀딩 시작하기' : 'Start a Funding' }}</v-btn>
             </template>
             <v-card width="600px">
               <v-card-title class="headline font-weight-bold mt-2 ml-4 text-center">
-                <span>Bring your project to life</span>
+                <span>{{ isLanguageToggled ? '펀딩 내용을 작성해주세요' : 'Bring your project to life' }}</span>
               </v-card-title>
               <v-card-text>
                 <v-container>
                   <v-layout class="d-flex flex-column">
                     <v-flex>
                       <v-text-field
-                        label="Title"
+                        label=Title
                         persistent-hint
                         v-model="newProject.title">
                       </v-text-field>
@@ -85,11 +91,17 @@
       </v-container>
 
       <v-container>
+        <v-tabs v-model="selectedTab" background-color="transparent">
+          <v-tab v-for="(tab, index) in tabs" :key="index" @click="changeTab(index)">
+            {{ isLanguageToggled ? tab.korean : tab.english }}
+          </v-tab>
+        </v-tabs>
+
         <h1 class="display-1 font-weight-bold mb-3">
-          Projects
+          {{ isLanguageToggled ? '펀딩 목록' : 'Funding Lists' }}
         </h1>
         <v-layout class="d-flex flex-column">
-          <v-flex v-for="(project, index) in projectData" :key="index">
+          <v-flex v-for="(project, index) in projectData" :key="index" :style="getCardStyle(project.currentState)">
             <v-dialog
               v-model="project.dialog"
               width="800px"
@@ -130,21 +142,22 @@
                         label
                         :color="stateMap[project.currentState].color"
                         text-color="white" class="mt-0">
-                      {{ stateMap[project.currentState].text }}
+                      <!-- {{ stateMap[project.currentState].text }} -->
+                      {{ isLanguageToggled ? stateMap[project.currentState].korean : stateMap[project.currentState].english }}
                       </v-chip>
                       {{ project.projectTitle }}
                     </div>
                     <br/>
-                    <span>{{ project.projectDesc.substring(0, 100) }}</span>
+                    <span><div v-html="project.projectDesc"></div></span>
                     <span v-if="project.projectDesc.length > 100">
                       ... <a @click="projectData[index].dialog = true">[Show full]</a>
                     </span>
                     <br/><br/>
-                    <small>Up Until: <b>{{ new Date(project.deadline * 1000).toLocaleString() }}</b></small>
+                    <small>{{ isLanguageToggled ? '만료일:' : 'Up until:' }} <b>{{ new Date(project.deadline * 1000).toLocaleString() }}</b></small>
                     <br/><br/>
-                    <small>Goal of <b>{{ project.goalAmount / 10**18 }} MATIC ({{ currentPrice.toFixed(2) * (project.goalAmount / 10**18) }} USD)</b></small>
-                    <small v-if="project.currentState == 1">wasn't achieved before deadline</small>
-                    <small v-if="project.currentState == 2">has been achieved</small>
+                    <small>{{ isLanguageToggled ? '목표 금액' : 'Goal of' }} <b>{{ project.goalAmount / 10**18 }} MATIC ({{ currentPrice.toFixed(2) * (project.goalAmount / 10**18) }} USD)</b></small>
+                    <small v-if="project.currentState == 1">{{ isLanguageToggled ? "이 만료일 이내에 달성되지 않았습니다." : "wasn't achieved before deadline" }}</small>
+                    <small v-if="project.currentState == 2">{{ isLanguageToggled ? '이 달성되었습니다.' : 'has been achieved' }}</small>
                   </div>
                 </v-card-title>
                 <v-flex
@@ -163,7 +176,7 @@
                     @click="fundProject(index)"
                     :loading="project.isLoading"
                   >
-                    Fund
+                  {{ isLanguageToggled ? '펀드' : 'Fund' }}
                   </v-btn>
                 </v-flex>
                 <v-flex class="d-flex ml-3" xs12 sm6 md3>
@@ -174,7 +187,7 @@
                     @click="getRefund(index)"
                     :loading="project.isLoading"
                   >
-                    Get refund
+                  {{ isLanguageToggled ? '환불받기' : 'Get refund' }}
                   </v-btn>
                 </v-flex>
                 <v-card-actions v-if="project.currentState == 0">
@@ -208,13 +221,21 @@ export default {
       startProjectDialog: false,
       account: null,
       stateMap: [
-        { color: 'primary', text: 'Ongoing' },
-        { color: 'warning', text: 'Expired' },
-        { color: 'success', text: 'Completed' },
+        { color: 'primary', korean: '진행중', english: 'Ongoing' },
+        { color: 'warning', korean: '만료됨', english: 'Expired' },
+        { color: 'success', korean: '완료됨', english: 'Completed' },
       ],
       projectData: [],
       newProject: { isLoading: false },
       currentPrice: 0,
+      selectedTab: 0,
+      isLanguageToggled: false,
+      tabs: [
+        { korean: '전체 펀딩', english: 'All Funding Lists' },
+        { korean: '진행중인 펀딩', english: 'Ongoing Funding Lists' },
+        { korean: '만료된 펀딩', english: 'Expired Funding Lists' },
+        { korean: '완료된 펀딩', english: 'Completed Funding Lists' },
+      ],
     };
   },
   mounted() {
@@ -226,21 +247,29 @@ export default {
   methods: {
     getProjects() {
       crowdfundInstance.methods.returnAllProjects().call().then((projects) => {
-        projects.forEach((projectAddress) => {
+        const projectPromises = projects.map((projectAddress) => {
           const projectInst = crowdfundProject(projectAddress);
-          projectInst.methods.getDetails().call().then((projectData) => {
+          return projectInst.methods.getDetails().call().then((projectData) => {
             const projectInfo = projectData;
             projectInfo.isLoading = false;
             projectInfo.contract = projectInst;
-            this.projectData.push(projectInfo);
+            return projectInfo;
           });
+        });
+
+        Promise.all(projectPromises).then((projectData) => {
+          // Up Until 날짜를 기준으로 프로젝트를 내림차순으로 정렬
+          projectData.sort((a, b) => b.deadline - a.deadline);
+
+          // 정렬된 프로젝트를 배열에 추가
+          this.projectData = projectData;
         });
       });
       fetch('https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd')
           .then((res) => res.json())
           .then((res) => {
             this.currentPrice = res['matic-network'].usd;
-      });
+          });
     },
     startProject() {
       this.newProject.isLoading = true;
@@ -294,7 +323,46 @@ export default {
     toggleDarkTheme() {
       this.$vuetify.theme.global.name = this.$vuetify.theme.global.name === 'light' ? 'dark' : 'light';
     },
-  },
+    toggleLanguage() {
+      console.log("언어 변경 토글 버튼을 클릭했습니다.");
+      this.isLanguageToggled = !this.isLanguageToggled; // 변수 이름 변경
+    },
+    changeTab(index) {
+      this.selectedTab = index;
+    },
+    getCardStyle(currentState) {
+      if (this.selectedTab === 0) {
+        console.log("전체 펀딩 버튼을 눌렀습니다.");
+        return 'display:block';
+      } else if (this.selectedTab === 1) {
+        console.log("진행중인 펀딩 버튼을 눌렀습니다.");
+        console.log(currentState)
+        if(currentState == 0){
+          return 'display:block'
+        }else{
+          return 'display:none'
+        }
+        // return currentState === 0 ? 'display:block' : 'display:none';
+      } else if (this.selectedTab === 2) {
+        console.log("만료된 펀딩 버튼을 눌렀습니다.");
+        console.log(currentState)
+        if(currentState == 1){
+          return 'display:block'
+        }else{
+          return 'display:none'
+        }
+        // return currentState === 1 ? 'display:block' : 'display:none';
+      } else if (this.selectedTab === 3) {
+        console.log("완료된 펀딩 버튼을 눌렀습니다.");
+        console.log(currentState)
+        if(currentState == 2){
+          return 'display:block'
+        }else{
+          return 'display:none'
+        }
+        // return currentState === 2 ? 'display:block' : 'display:none';
+      }
+    }
+  }
 };
-
 </script>
