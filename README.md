@@ -1,6 +1,7 @@
 # 크라우드펀딩을 통해 듣는 스토리 Dapp
+Crowdfunding gives a story
 
-CrowdFunding Dapp in polygon testnet(Mumbai)
+desc: CrowdFunding Dapp in polygon testnet(Mumbai)
 
 ## Project Setup
 
@@ -19,3 +20,26 @@ npm run dev
 ```sh
 npm run build
 ```
+
+images
+---
+[Main Page]
+<img width="1440" alt="1" src="https://github.com/with-developer/Crowdfunding-gives-a-story/blob/main/images/1.png">
+
+[Expired Page]
+<img width="1440" alt="1" src="https://github.com/with-developer/Crowdfunding-gives-a-story/blob/main/images/2.png">
+
+[Completed Page]
+<img width="1440" alt="1" src="https://github.com/with-developer/Crowdfunding-gives-a-story/blob/main/images/3.png">
+
+[Story By My Page]
+<img width="1440" alt="1" src="https://github.com/with-developer/Crowdfunding-gives-a-story/blob/main/images/4.png">
+
+[Language Toggle Function]
+<img width="1440" alt="1" src="https://github.com/with-developer/Crowdfunding-gives-a-story/blob/main/images/5.png">
+
+[White & Dark Toggle Function]
+<img width="1440" alt="1" src="https://github.com/with-developer/Crowdfunding-gives-a-story/blob/main/images/6.png">
+
+[Add Story Function]
+<img width="1440" alt="1" src="https://github.com/with-developer/Crowdfunding-gives-a-story/blob/main/images/7.png">
