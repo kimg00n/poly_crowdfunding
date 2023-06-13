@@ -126,7 +126,7 @@
                     {{ project.projectTitle }}
                   </v-card-title>
                   <v-card-text>
-                    {{ project.projectDesc }}
+                    <div v-html="project.projectDesc"></div>
                   </v-card-text>
                   <v-card-actions>
                     <v-spacer></v-spacer>
@@ -163,9 +163,17 @@
                         {{ project.projectTitle }}
                       </div>
                       <br/>
-                      <span><div v-html="project.projectDesc"></div></span>
+                      <span v-if="project.projectDesc.length > 100"><div v-html="project.projectDesc.substring(0, 100)"></div>...</span>
+                      <span v-else><div v-html="project.projectDesc"></div></span>
                       <span v-if="project.projectDesc.length > 100">
-                        ... <a @click="projectData[index].dialog = true">[Show full]</a>
+                        <br/>
+                        <v-btn
+                          color="blue darken-1"
+                          flat="flat"
+                          @click="projectData[index].dialog = true"
+                        >
+                          {{ isLanguageToggled ? '자세히 보기' : 'View Details' }}
+                        </v-btn>
                       </span>
                       <br/><br/>
                       <small>{{ isLanguageToggled ? '만료일:' : 'Up until:' }} <b>{{ new Date(project.deadline * 1000).toLocaleString() }}</b></small>
@@ -291,7 +299,7 @@
         this.newProject.isLoading = true;
         crowdfundInstance.methods.startProject(
           this.newProject.title,
-          this.newProject.description,
+          this.newProject.description.split('\n').join('<br>'),
           this.newProject.duration,
           web3.utils.toWei(this.newProject.amountGoal, 'ether'),
         ).send({
