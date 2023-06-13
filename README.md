@@ -20,6 +20,13 @@ npm run dev
 ```sh
 npm run build
 ```
+---
+## Run with Docker
+
+```sh
+docker build . -t <image-name>:<version>
+docker run -p <host-port>:5173 <image-name>:<version>
+```
 
 images
 ---
