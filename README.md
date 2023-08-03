@@ -27,6 +27,9 @@ npm run build
 docker build . -t <image-name>:<version>
 docker run -p <host-port>:5173 <image-name>:<version>
 ```
+---
+## Presentation(https://github.com/kimg00n/poly_crowdfunding/blob/main/%EB%B8%94%EB%A1%9D%EC%B2%B4%EC%9D%B8-%EC%B5%9C%EC%A2%85%EB%B0%9C%ED%91%9C-18501006.pptx)
+
 
 images
 ---
